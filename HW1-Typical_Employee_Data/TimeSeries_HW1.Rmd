@@ -1,0 +1,80 @@
+---
+title: "TimeSeriesHW1"
+output: html_document
+date: "2025-02-07"
+---
+
+```{r}
+df <- read.csv(file.path("Typical_Employee_Survey_Data.csv"))
+head(df)
+
+headers <- c("Age", "Gender", "Job Satisfaction", "Most Important Job Factor", 
+             "Years Worked", 
+            "Promotion Likelihood", "Work Decision Making", 
+            "Budgetary Decision Making", "Pride in Organization", 
+            "Likelihood to Stay Despite Greater Pay", "Workplace Relations")
+names(df) <- headers            
+
+head(df)
+
+
+# Main takeaways
+descriptions <- c(
+  "This chart shows that the median age for employees is at 38 years, and shows little skew except for some outliers in the 60s range",
+  "There are slightly more Males than Females",
+  "Over 50% of respondents are the most satisfied with their job",
+  "Most people care most about enjoying the work, flexibility is not so important",
+  "This chart is far more skewed right, with a median tenure at 5 years, but many employees who have worked far longer, including for over 50 years",
+  "Individuals do not feel optimistic about their chances for promotion",
+  "Employees feel they are only allowed to make decisions about their work moderately",
+  "A little over 50% feel involved in budgetary decision making",
+  "Most are somewhat proud about working in the organization, but not very proud",
+  "Most employees signal they are unlikely to leave this job for a higher paying opportunity",
+  "Employees feel very positive about their workplace relations"
+)
+
+# Labels
+labels_list <- list(
+  NULL,  # Age
+  c("Male", "Female"),  # Gender
+  c("Very Satisfied", "Moderately Satisfied", "A Little Dissatisfied", "Very Dissatisfied"),  # Job Satisfaction
+  c("High Income", "No Danger of Being Fired", "Flexible Hours", "Opportunities for Advancement"),  # Most Important Job Factor
+  NULL, # Years Worked
+  c("Very Likely", "Likely", "Not Sure", "Unlikely", "Very Unlikely"),  # Promotion Likelihood
+  c("Always", "Much of the Time", "Sometimes", "Never"),  # Work Decision Making
+  c("Yes", "No"),  # Budgetary Decision Making
+  c("Very Proud", "Somewhat Proud", "Indifferent", "Not At All Proud"),  # Pride in Organization
+  c("Very Likely", "Likely", "Not Sure", "Unlikely", "Very Unlikely"),  # Likelihood to Stay Despite Greater Pay
+  c("Very Good", "Good", "So So", "Bad", "Very Bad")  # Workplace Relations
+)
+
+# Fivenum and Boxplots
+cat("Column:  ", names(df[1]), "\nFivenum: ", fivenum(df[[1]]), "\n")
+boxplot(df[[1]], main="Employee Age", ylab="Age (Years)")
+print(descriptions[1])
+
+
+cat("Column:  ", names(df[5]), "\nFivenum: ", fivenum(df[[5]]), "\n")
+boxplot(df[[5]], main="Employee Years Worked", ylab="Years")
+print(descriptions[5])
+
+
+#Factors and Visualizations
+for (col in 1:length(headers)) {
+  if (col != 1 & col != 5){
+    df[[col]] <- factor(df[[col]], levels = 1:length(labels_list[[col]]), 
+                        labels = labels_list[[col]])
+    plot(df[[col]], main=names(df[[col]]), cex.names=0.7)
+    print(descriptions[col])
+  }
+}
+
+
+# Some Scatterplots
+scatter.smooth(df$Age, df$`Years Worked`, xlab="Age", ylab="Years Worked")
+print("Employee Years worked at the company is positively correlated with Age, which makes intuitive sense")
+
+scatter.smooth(df[[1]], df[[6]], xlab="Age", ylab="Promotion Chance")
+print("Older employees tend to feel more positive about promotion chances")
+```
+
