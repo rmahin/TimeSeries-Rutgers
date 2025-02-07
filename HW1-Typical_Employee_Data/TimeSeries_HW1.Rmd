@@ -17,7 +17,6 @@ names(df) <- headers
 
 head(df)
 
-
 # Main takeaways
 descriptions <- c(
   "This chart shows that the median age for employees is at 38 years, and shows little skew except for some outliers in the 60s range",
