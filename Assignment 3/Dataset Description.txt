@@ -1,0 +1,24 @@
+Dataset Description
+
+This dataset records the Consumer Price Index for All Urban Consumers: All Items for all months since 1947. The Consumer Price Index is the
+price index of a basket of goods and services paid by urban consumers. Percent changes in the price index measure the inflation 
+rate between any two time periods.
+
+For this dataset, the CPI value represents the % value change in prices relative to the base of 1982-1984(CPI = 100).
+
+
+Data Collection Methodology
+
+This data is collected by the US Bureau of Labor Statistics every month. They collect it by recording the prices of various 
+food, clothing, shelter, fuels, transportation fares, service fees (e.g., water and sewer service), and sales taxes.
+
+They collect the prices monthly from about 4,000 housing units and approximately 26,000 retail establishments across 87 urban areas,
+before averaging them with weights representing their importance on spending for that particular group. The BLS, for this dataset,
+has also seasonally adjusted the values, which removes the effects of seasonal changes such as weather, school year, production cycles,
+and holidays.
+
+
+Why This Dataset?
+
+This dataset intrigues me because, in essence, it is the key metric for understanding how the cost for consumption has changed through
+the years. I am interested to see if the change in CPI follows a more linear trend or is exponentially increasing.
