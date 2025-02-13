@@ -1,0 +1,3 @@
+﻿Variable,Variable name,Measurement unit,Allowed values,Description
+Date,observation_date,yyyy-mm-dd,1947-01-01 / 2025-01-01,The date recorded by the BLS. Monthly Periodicity
+CPI,CPIUSCL,Numeric,21.48 - 219.086,Consumer Price Index for US Consumers. L denotes it is seasonally adjusted. % Change in consumption expenditures relative to 1983
