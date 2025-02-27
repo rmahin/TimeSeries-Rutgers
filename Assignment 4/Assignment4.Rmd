@@ -1,0 +1,112 @@
+---
+title: "Assignment4"
+output: html_document
+date: "2025-02-25"
+---
+
+```{r}
+df <- read.csv("https://raw.githubusercontent.com/rmahin/TimeSeries-Rutgers/main/Assignment%203/CPIAUCSL.csv", header=TRUE)
+head(df)
+library(fpp)
+library(fpp2)
+
+
+timeseries <- ts(df$CPIAUCSL, start = c(1947, 1), frequency = 12) # Monthly periodicity
+timeseries <- window(timeseries, start = c(2010, 1)) # Start from 2010 and on
+
+plot(timeseries, xlab="Date", ylab="CPI (Seaonally Adjusted)")
+
+Acf(timeseries) 
+# time series shows strong correlation
+# gradual trend downward instead of seasonal spike as well likely due to the 
+# dataset already being seasonally adjusted
+
+Acf(timeseries, lag.max=12*10) # Lets see Acf with more lags in data
+
+ts_decomp <- stl(timeseries, s.window = "periodic")
+plot(ts_decomp)
+# Shows an almost 1:1 pattern with Trend and Data
+# Seasonality is oscillating rapidly which seems odd at first but makes sense
+# When you see its range is inbetween -0.3 and and 0.1 (basically no effect)
+# This is to be expected since it's a seasonally adjusted dataset
+
+# Total Mean Forecast
+mean_forecast <- meanf(timeseries, 12) 
+mean_forecast # predicts the same number (254.49) for the next year
+# the number is stationary because its just the mean off all points 
+# in the data (post-2010 filter). Probably highly inaccurate because there is
+# a clear upward trend in the data / not horizontal around mean
+
+# Naive Forecast
+naive_forecast <- naive(timeseries, 12)
+naive_forecast
+# The naive forecast just predicts the last available data point for the next
+# 12 months (319.08). Not much else to add here
+
+# Random Walk
+rwf_forecast <- rwf(timeseries, 12, drift = TRUE)
+rwf_forecast
+# Random Walk behaves like the naive forecast except it adds on a trend
+# variable to account for the increasing trend behavior in the data
+
+# Seasonal Naive 
+snaive_forecast <- snaive(timeseries, 12)
+snaive_forecast
+# Seasonal Naive is like RWF but instead of trend it accounts for seasonality
+# The snaive forecast shows increasing from 311 on Feb 2025 to 316 in Nov 2025
+# This is interesting because the dataset is seasonally adjusted so I wasn't 
+# expecting a clear trend in this
+
+# Moving Averages
+MA_forecast <- ma(timeseries, order = 5)
+# Moving average gives the average value of the 5 nearest points in the timeseries
+plot(timeseries)
+lines(MA_forecast, col = "pink")
+# Plotting it shows it follows the actual values pretty closely which means the 
+# data is more smooth / not very volatile
+
+# Decomposition
+f_stl <- forecast(ts_decomp, h=12)
+f_stl
+# This uses the decomposition from before to make forecast
+# I expect it will mainly just follow the trend aspect since as we saw before
+# the Seasonal variability was near 0 in the decomposition
+
+# Holt Winters
+hw <- HoltWinters(timeseries)
+f_hw <- forecast(hw, h = 12)
+hw #gives:
+# alpha: 1
+# beta : 0.20137
+# gamma: 0.2014353
+# Alpha is maxed value which shows all focus on most recent point with it decaying
+# instantly to 0. Small beta and gamma factors
+
+
+plot(mean_forecast)
+lines(naive_forecast$mean, col = "red")
+lines(rwf_forecast$mean, col = "green")
+lines(snaive_forecast$mean, col = "black")
+lines(MA_forecast, col = "pink")
+lines(f_stl$mean, col = "orange")
+lines(f_hw$mean, col = "cyan")
+
+legend("topleft", 
+       legend = c("Mean Forecast", "Naive Forecast", "Random Walk Forecast", 
+                  "Seasonal Naive Forecast", "Moving Average", "Decomposition",
+                  "Holt Winters"), 
+       col = c("blue", "red", "green", "black", "pink", "orange", "cyan"), 
+       lty = 1, 
+       cex = 0.8)
+
+
+# MAPE seems like good accuracy measure since CPI is % index
+accuracy(mean_forecast) # 891% MAPE which is disastrous as expected
+accuracy(naive_forecast) # MAPE of 26%
+accuracy(rwf_forecast) # MAPE of 19%
+accuracy(f_stl) # MAPE of 17%
+accuracy(f_hw) # MAPE of 22%
+
+paste("The Best Model is the Decomposition Forecast with a 17% MAPE.")
+```
+
