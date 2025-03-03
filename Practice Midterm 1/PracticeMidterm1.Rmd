@@ -1,0 +1,75 @@
+---
+title: "PracticeMidterm1"
+output: html_document
+date: "2025-03-03"
+---
+
+```{r}
+library(fpp2)
+attributes(arrivals)
+arrivals
+ts <- arrivals[,"US"]
+
+# The Time Series plot shows the international arrivals (in thousands) to Australia from US
+# There is a quarterly periodicity and spans from 1981Q1 - 2012Q3
+# There seems to be a general upwards trend with many oscillations
+
+quantile(ts)
+mean(ts)
+
+boxplot(ts, main="US Arrivals to Australia", xlab="US", ylab="Arrivals", col='lightblue')
+
+# The data seems approximately centered without much skew
+
+decomp <- decompose(ts)
+plot(decomp)
+
+# Yes the time series is seasonal as there is a high seasonal decomposition
+
+# The time series is additive
+
+# Seasonal Indices
+# s1: 6.784749
+# s2: -7.969292
+# s3: -4.717247
+# s4: 5.901790
+
+# Quarter 2 is low and Quarter 1 is high
+# Quarter 2 might be low since thats a bad climate in Australia
+# Quarter 1 might be high because people are traveling to warmer weather away from American winter since Q4 is also high
+
+# Seasonally Adjusted time series
+adj <- HoltWinters(ts, gamma=FALSE)
+plot(adj)
+# Yes seasonality has high fluctuations
+
+# Naive
+naive_forecast <- naive(ts, 4)
+res <- residuals(naive_forecast)
+plot(res)
+# The residuals seem to be repeating indicating that there may be 
+# an underlying component that naive isnt capturing
+
+hist(res)
+# The residuals appear normally distributed
+
+# Plot residuals along with fitted line
+plot(naive_forecast$fitted)
+lines(naive_forecast$fitted + res, col="red")
+
+# Plots residuals with actual values
+plot(ts)
+lines(ts + res, col="red")
+
+Acf(res)
+# There is a significant residual every even lag (2 quarters)
+
+accuracy(naive_forecast)
+plot(naive_forecast)
+naive_forecast
+# The accuracy is not very good, it has a MAPE of 12%
+# It predicts the time series in 1 year will be 106.54
+# One other observation is that it is stationary only
+# Keeping the exact last recorded value without adjustments
+```
+
